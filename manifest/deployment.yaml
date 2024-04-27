@@ -26,7 +26,33 @@ spec:
     spec:
       containers:
       - name: movie-booking-container
-        image: vishaalaravinth/movie-booking:1.0
+        image: vishaalaravinth/movie-booking:2.0
+        ports:
+        - containerPort: 5000
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: movie-booking
+  namespace: devops
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: movie-booking
+  strategy:
+    blueGreen:
+      activeService: movie-booking-service
+      previewService: movie-booking-preview-service
+      autoPromotionEnabled: true
+  template:
+    metadata:
+      labels:
+        app: movie-booking
+    spec:
+      containers:
+      - name: movie-booking
+        image: vishaalaravinth/movie-booking:2.0
         ports:
         - containerPort: 5000
 
