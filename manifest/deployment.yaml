@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: movie-booking-deployment
+  name: movie-booking
   labels:
     app: movie-booking
   namespace: movie-booking
