@@ -34,7 +34,6 @@ apiVersion: argoproj.io/v1alpha1
 kind: Rollout
 metadata:
   name: movie-booking
-  namespace: devops
 spec:
   replicas: 1
   selector:
