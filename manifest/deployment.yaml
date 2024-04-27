@@ -1,21 +1,12 @@
-apiVersion: v1
-kind: Service
-metadata:
-  name: movie-booking-service
-spec:
-  selector:
-    app: movie-booking
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 5000
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: movie-booking
+  name: movie-booking-deployment
+  labels:
+    app: movie-booking
+  namespace: movie-booking
 spec:
-  replicas: 3
+  replicas: 2
   selector:
     matchLabels:
       app: movie-booking
@@ -25,20 +16,61 @@ spec:
         app: movie-booking
     spec:
       containers:
-      - name: movie-booking-container
-        image: vishaalaravinth/movie-booking:1.0
+      - name: movie-booking
+        image: vishaalaravinth/movie-booking:2.0
         ports:
         - containerPort: 5000
 ---
-apiVersion: v1
-kind: Pod
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
 metadata:
-  name: movie-booking-pod
-  labels:
-    app: movie-booking
+  name: movie-booking-rollout
+  namespace: movie-booking
 spec:
-  containers:
-  - name: movie-booking-container
-    image: vishaalaravinth/movie-booking:1.0
-    ports:
-    - containerPort: 5000
+  replicas: 1
+  selector:
+    matchLabels:
+      app: movie-booking
+  strategy:
+    blueGreen:
+      activeService: movie-booking-service
+      previewService: movie-booking-preview-service
+      autoPromotionEnabled: true
+  template:
+    metadata:
+      labels:
+        app: movie-booking
+    spec:
+      containers:
+      - name: movie-booking
+        image: vishaalaravinth/movie-booking:2.0
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: movie-booking-service
+  namespace: movie-booking
+spec:
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 5000
+  selector:
+    app: movie-booking
+  type: NodePort
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: movie-booking-preview-service
+  namespace: movie-booking
+spec:
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 5000
+  selector:
+    app: movie-booking
+  type: NodePort
