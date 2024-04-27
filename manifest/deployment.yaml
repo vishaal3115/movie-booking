@@ -30,28 +30,6 @@ spec:
         ports:
         - containerPort: 5000
 ---
-apiVersion: apps/v1
-kind: ReplicaSet
-metadata:
-  name: movie-booking-rs
-  labels:
-    app: movie-booking
-spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: movie-booking
-  template:
-    metadata:
-      labels:
-        app: movie-booking
-    spec:
-      containers:
-      - name: movie-booking-container
-        image: vishaalaravinth/movie-booking:1.0
-        ports:
-        - containerPort: 5000
----
 apiVersion: v1
 kind: Pod
 metadata:
